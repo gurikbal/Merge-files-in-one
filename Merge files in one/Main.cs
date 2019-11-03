@@ -43,7 +43,7 @@ namespace Merge_files_in_one
         #region " Menu functions "
         internal static void about()
         {
-            var ss = "\n        ****** Merge files in one ******  \n                    build by G. Singh  \n                20-09-2019 build 1.0.0.0  ";
+            var ss = "\n        ****** Merge files in one ******  \n                    build by G. Singh  \n                03-11-2019 build 1.2.0.0  ";
             MessageBox.Show(ss);
         }
         internal static void all_file_text()

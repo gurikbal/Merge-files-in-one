@@ -56,10 +56,6 @@ namespace Merge_files_in_one
                 Main.PluginCleanUp();
                 Marshal.FreeHGlobal(_ptrPluginName);
             }
-            else if (nc.nmhdr.code == (uint)NppMsg.NPPN_BUFFERACTIVATED)
-            {
-                frmMyDlg.NPPN_BUFFERACTIVATED_N();
-            }
         }
     }
 }
