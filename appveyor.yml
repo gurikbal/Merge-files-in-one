@@ -1,0 +1,57 @@
+version: 1.2.0.{build}
+image: Visual Studio 2017
+
+ 
+platform:
+    - x86
+    - x64
+
+configuration:
+    - Debug
+    - Release
+
+install:
+    - if "%platform%"=="x64" set archi=amd64
+    - if "%platform%"=="x64" set platform_input=x64
+
+    - if "%platform%"=="x86" set archi=x86
+    - if "%platform%"=="x86" set platform_input=x86
+
+    - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %archi%
+
+build_script:
+    - cd "%APPVEYOR_BUILD_FOLDER%"\
+    - msbuild "Merge files in one.sln" /m /p:configuration="%configuration%" /p:platform="%platform_input%" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
+after_build:
+    - cd "%APPVEYOR_BUILD_FOLDER%"\"Merge files in one"\
+    - ps: >-
+
+        Push-AppveyorArtifact "bin\$($env:PLATFORM_INPUT)\$($env:CONFIGURATION)\Merge files in one.dll" -FileName Merge_files_in_one.dll
+
+        if ($($env:APPVEYOR_REPO_TAG) -eq "true" -and $env:CONFIGURATION -eq "Release") {
+            if($env:PLATFORM_INPUT -eq "x64"){
+                $ZipFileName = "Merge_files_in_one_$($env:APPVEYOR_REPO_TAG_NAME)_x64.zip"
+                7z a $ZipFileName "bin\$env:PLATFORM_INPUT\$env:CONFIGURATION\Merge files in one.dll"
+            }
+            if($env:PLATFORM_INPUT -eq "x86"){
+                $ZipFileName = "Merge_files_in_one_$($env:APPVEYOR_REPO_TAG_NAME)_x86.zip"
+                7z a $ZipFileName "bin\$env:PLATFORM_INPUT\$env:CONFIGURATION\Merge files in one.dll"
+            }
+        }
+
+artifacts:
+  - path: Merge_files_in_one_*.zip
+    name: releases
+
+deploy:
+    provider: GitHub
+    auth_token:
+        secure: !!TODO, see https://www.appveyor.com/docs/deployment/github/#provider-settings!!
+    artifact: releases
+    draft: false
+    prerelease: false
+    force_update: true
+    on:
+        appveyor_repo_tag: true
+        configuration: Release
